@@ -29,6 +29,9 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
+  # Provided by build.yml.
+  export CC="${LINUX_CC}"
+  export CXX="${LINUX_CXX}"
   ;;
 
 "Darwin")
@@ -80,7 +83,8 @@ git checkout "${COMMIT_ID}"
 BUILD_DIR="b_${CONFIG}"
 
 mkdir -p "${BUILD_DIR}"
+cd "${BUILD_DIR}"
 
-cmake -S llvm -B "${BUILD_DIR}" -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_ENABLE_PROJECTS='clang'"
+cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_ENABLE_PROJECTS='clang'"
 cmake --build . --config "${CMAKE_BUILD_TYPE}"
 cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
