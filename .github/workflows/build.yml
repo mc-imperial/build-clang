@@ -14,9 +14,7 @@
 
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -30,16 +28,24 @@ jobs:
           - Release
         # Manually list various Linux configurations.
         include:
-          # clang-13
+          # clang-12
           - os: ubuntu-latest
             config: Release
-            linux_cc: clang-13
-            linux_cxx: clang++-13
+            linux_cc: clang-12
+            linux_cxx: clang++-12
+          # clang-12 asan
+          - os: ubuntu-latest
+            config: Release
+            linux_cc: clang-12
+            linux_cxx: clang++-12
+            use_sanitizer: Address
     runs-on: ${{ matrix.os }}
     env:
       CONFIG: ${{ matrix.config }}
       LINUX_CC: ${{ matrix.linux_cc }}
       LINUX_CXX: ${{ matrix.linux_cxx }}
+      USE_SANITIZER: ${{ matrix.use_sanitizer }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
 
       - name: cancel_previous
@@ -79,7 +85,7 @@ jobs:
           !startsWith(matrix.os, 'windows')
       - name: build_step_windows
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           "C:\Program Files\Git\bin\bash.EXE" --noprofile --norc -e -o pipefail build.sh
         shell: cmd
         if: |
