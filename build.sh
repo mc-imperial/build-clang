@@ -64,6 +64,9 @@ mkdir -p "${HOME}/bin"
 
 pushd "${HOME}/bin"
 
+# Install github-release-retry.
+"${PYTHON}" -m pip install --user 'github-release-retry==1.*'
+
 # Install ninja.
 curl -fsSL -o ninja-build.zip "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-${NINJA_OS}.zip"
 unzip ninja-build.zip
@@ -83,8 +86,27 @@ git checkout "${COMMIT_ID}"
 BUILD_DIR="b_${CONFIG}"
 
 mkdir -p "${BUILD_DIR}"
-cd "${BUILD_DIR}"
-
+pushd "${BUILD_DIR}"
 cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_ENABLE_PROJECTS='clang'"
 cmake --build . --config "${CMAKE_BUILD_TYPE}"
 cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
+popd
+
+# TODO: for debugging; remove once done.
+ls "${INSTALL_DIR}"
+find "${INSTALL_DIR}" -name "*.cmake"
+
+# zip file.
+pushd "${INSTALL_DIR}"
+zip -r "../${INSTALL_DIR}.zip" ./*
+popd
+
+DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}."
+
+"${PYTHON}" -m github_release_retry.github_release_retry \
+  --user "mc-imperial" \
+  --repo "llvm-project" \
+  --tag_name "github/mc-imperial/llvm-project/${COMMIT_ID}" \
+  --target_commitish "${GITHUB_SHA}" \
+  --body_string "${DESCRIPTION}" \
+  "${INSTALL_DIR}.zip"
