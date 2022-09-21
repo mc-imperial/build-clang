@@ -30,11 +30,11 @@ jobs:
           - Release
         # Manually list various Linux configurations.
         include:
-          # clang-13
+          # clang-12
           - os: ubuntu-latest
             config: Release
-            linux_cc: clang-13
-            linux_cxx: clang++-13
+            linux_cc: clang-12
+            linux_cxx: clang++-12
     runs-on: ${{ matrix.os }}
     env:
       CONFIG: ${{ matrix.config }}
