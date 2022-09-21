@@ -41,6 +41,7 @@ jobs:
       LINUX_CC: ${{ matrix.linux_cc }}
       LINUX_CXX: ${{ matrix.linux_cxx }}
     steps:
+
       - name: cancel_previous
         uses: styfle/cancel-workflow-action@0.8.0
         with:
@@ -65,7 +66,7 @@ jobs:
         uses: ./../.github/actions/checkout
 
       - name: setup_python
-       uses: ./../.github/actions/setup-python
+        uses: ./../.github/actions/setup-python
         with:
           python-version: 3.9
           architecture: x64
