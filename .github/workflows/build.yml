@@ -14,20 +14,16 @@
 
 
 on:
-  push:
+  pull_request:
     branches:
-      - 'master'
-      - 'test*'
-    paths:
-      - 'COMMIT_ID'
-  workflow_dispatch:
+      - main
 
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
           - windows-latest
           - macOS-latest
         config:
@@ -42,14 +38,34 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CONFIG: ${{ matrix.config }}
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      LINUX_CC: ${{ matrix.linux_cc }}
+      LINUX_CXX: ${{ matrix.linux_cxx }}
     steps:
+      - name: cancel_previous
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: get_actions
+        run: |
+          mkdir -p ./../.github/actions/
+          pushd ./../.github/actions/
+            git clone https://github.com/actions/setup-python.git
+            pushd setup-python/
+              git checkout v2
+            popd
+            git clone https://github.com/actions/checkout.git
+            pushd checkout/
+              git checkout v2
+            popd
+          popd
+        shell: bash
 
       - name: checkout
-        uses: actions/checkout@v2
+        uses: ./../.github/actions/checkout
 
       - name: setup_python
-        uses: actions/setup-python@v2
+       uses: ./../.github/actions/setup-python
         with:
           python-version: 3.9
           architecture: x64
