@@ -40,7 +40,7 @@ jobs:
             config: Release
             linux_cc: clang-12
             linux_cxx: clang++-12
-	    use_sanitizer: Address
+            use_sanitizer: Address
     runs-on: ${{ matrix.os }}
     env:
       CONFIG: ${{ matrix.config }}
