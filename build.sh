@@ -94,6 +94,17 @@ BUILD_DIR="b_${CONFIG}"
 
 CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'" "-DLLVM_TARGETS_TO_BUILD=X86")
 
+echo "${USE_SANITIZER}"
+
+if [ -z ${USE_SANITIZER+x} ]
+then
+    echo "FOUND IT!"
+else
+    echo "DID NOT FIND IT!"
+fi
+exit 1
+
+
 if [ -z ${USE_SANITIZER+x} ]
 then
     CMAKE_OPTIONS+=("-DLLVM_USE_SANITIZER=${USE_SANITIZER}")
