@@ -61,7 +61,7 @@ COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
 
 INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
 
-if [ -z ${USE_SANITIZER+x} ]
+if [ ! -z ${USE_SANITIZER+x} ]
 then
     INSTALL_DIR="${INSTALL_DIR}-${USE_SANITIZER}-Sanitizer"
 fi
@@ -92,11 +92,11 @@ git checkout "${COMMIT_ID}"
 
 BUILD_DIR="b_${CONFIG}"
 
-CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'" "-DLLVM_TARGETS_TO_BUILD=X86")
+CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'" "-DLLVM_TARGETS_TO_BUILD=X86" "-DLLVM_ENABLE_ZSTD=OFF")
 
 echo "${USE_SANITIZER}"
 
-if [ -z ${USE_SANITIZER+x} ]
+if [ ! -z ${USE_SANITIZER+x} ]
 then
     echo "FOUND IT!"
 else
@@ -105,7 +105,7 @@ fi
 exit 1
 
 
-if [ -z ${USE_SANITIZER+x} ]
+if [ ! -z ${USE_SANITIZER+x} ]
 then
     CMAKE_OPTIONS+=("-DLLVM_USE_SANITIZER=${USE_SANITIZER}")
 fi
