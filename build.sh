@@ -61,6 +61,11 @@ COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
 
 INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
 
+if [ -z ${USE_SANITIZER+x} ]
+then
+    INSTALL_DIR="${INSTALL_DIR}-${USE_SANITIZER}-Sanitizer"
+fi
+
 export PATH="${HOME}/bin:$PATH"
 
 mkdir -p "${HOME}/bin"
@@ -81,26 +86,25 @@ popd
 CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
 
-#git clone https://github.com/llvm/llvm-project.git
-#cd llvm-project
-#git checkout "${COMMIT_ID}"
-#
-#BUILD_DIR="b_${CONFIG}"
-#
-#mkdir -p "${BUILD_DIR}"
-#pushd "${BUILD_DIR}"
-## "-DLLVM_ENABLE_PROJECTS='clang'"
-#cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_TARGETS_TO_BUILD=X86"
-#cmake --build . --config "${CMAKE_BUILD_TYPE}"
-#cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
-#popd
+git clone https://github.com/llvm/llvm-project.git
+cd llvm-project
+git checkout "${COMMIT_ID}"
 
-# TODO: for debugging; remove once done.
-#ls "${INSTALL_DIR}"
-#find "${INSTALL_DIR}" -name "*.cmake"
+BUILD_DIR="b_${CONFIG}"
 
-mkdir "${INSTALL_DIR}"
-touch "${INSTALL_DIR}/temp.txt"
+CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'" "-DLLVM_TARGETS_TO_BUILD=X86")
+
+if [ -z ${USE_SANITIZER+x} ]
+then
+    CMAKE_OPTIONS+=("-DLLVM_USE_SANITIZER=${USE_SANITIZER}")
+fi
+
+mkdir -p "${BUILD_DIR}"
+pushd "${BUILD_DIR}"
+cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "${CMAKE_OPTIONS[@]}"
+cmake --build . --config "${CMAKE_BUILD_TYPE}"
+cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
+popd
 
 # zip file.
 pushd "${INSTALL_DIR}"
