@@ -86,16 +86,6 @@ popd
 CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
 
-echo "${USE_SANITIZER}"
-
-if [ -n "${USE_SANITIZER}" ]
-then
-    echo "FOUND IT!"
-else
-    echo "DID NOT FIND IT!"
-fi
-exit 1
-
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
