@@ -20,6 +20,9 @@ set -u
 
 WORK="$(pwd)"
 
+# Old bash versions can't expand empty arrays, so we always include at least this option.
+CMAKE_OPTIONS=("-DCMAKE_OSX_ARCHITECTURES=x86_64")
+
 help | head
 
 uname
@@ -77,7 +80,6 @@ popd
 
 CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
-CMAKE_OPTIONS="TODO"
 
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
@@ -87,7 +89,8 @@ BUILD_DIR="b_${CONFIG}"
 
 mkdir -p "${BUILD_DIR}"
 pushd "${BUILD_DIR}"
-cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_ENABLE_PROJECTS='clang'"
+# "-DLLVM_ENABLE_PROJECTS='clang'"
+cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_TARGETS_TO_BUILD=x86_64"
 cmake --build . --config "${CMAKE_BUILD_TYPE}"
 cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
 popd
@@ -101,7 +104,7 @@ pushd "${INSTALL_DIR}"
 zip -r "../${INSTALL_DIR}.zip" ./*
 popd
 
-DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}."
+DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}.")"
 
 "${PYTHON}" -m github_release_retry.github_release_retry \
   --user "mc-imperial" \
