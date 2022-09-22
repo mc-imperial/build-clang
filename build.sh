@@ -81,23 +81,26 @@ popd
 CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
 
-git clone https://github.com/llvm/llvm-project.git
-cd llvm-project
-git checkout "${COMMIT_ID}"
-
-BUILD_DIR="b_${CONFIG}"
-
-mkdir -p "${BUILD_DIR}"
-pushd "${BUILD_DIR}"
-# "-DLLVM_ENABLE_PROJECTS='clang'"
-cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_TARGETS_TO_BUILD=X86"
-cmake --build . --config "${CMAKE_BUILD_TYPE}"
-cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
-popd
+#git clone https://github.com/llvm/llvm-project.git
+#cd llvm-project
+#git checkout "${COMMIT_ID}"
+#
+#BUILD_DIR="b_${CONFIG}"
+#
+#mkdir -p "${BUILD_DIR}"
+#pushd "${BUILD_DIR}"
+## "-DLLVM_ENABLE_PROJECTS='clang'"
+#cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DLLVM_TARGETS_TO_BUILD=X86"
+#cmake --build . --config "${CMAKE_BUILD_TYPE}"
+#cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
+#popd
 
 # TODO: for debugging; remove once done.
-ls "${INSTALL_DIR}"
-find "${INSTALL_DIR}" -name "*.cmake"
+#ls "${INSTALL_DIR}"
+#find "${INSTALL_DIR}" -name "*.cmake"
+
+mkdir "${INSTALL_DIR}"
+touch "${INSTALL_DIR}/temp.txt"
 
 # zip file.
 pushd "${INSTALL_DIR}"
