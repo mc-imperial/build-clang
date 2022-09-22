@@ -61,7 +61,7 @@ COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
 
 INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
 
-if [ ! -z ${USE_SANITIZER+x} ]
+if [ -n "${USE_SANITIZER}" ]
 then
     INSTALL_DIR="${INSTALL_DIR}-${USE_SANITIZER}-Sanitizer"
 fi
@@ -86,6 +86,16 @@ popd
 CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
 
+echo "${USE_SANITIZER}"
+
+if [ -n "${USE_SANITIZER}" ]
+then
+    echo "FOUND IT!"
+else
+    echo "DID NOT FIND IT!"
+fi
+exit 1
+
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
@@ -94,18 +104,7 @@ BUILD_DIR="b_${CONFIG}"
 
 CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'" "-DLLVM_TARGETS_TO_BUILD=X86" "-DLLVM_ENABLE_ZSTD=OFF")
 
-echo "${USE_SANITIZER}"
-
-if [ ! -z ${USE_SANITIZER+x} ]
-then
-    echo "FOUND IT!"
-else
-    echo "DID NOT FIND IT!"
-fi
-exit 1
-
-
-if [ ! -z ${USE_SANITIZER+x} ]
+if [ -n "${USE_SANITIZER}" ]
 then
     CMAKE_OPTIONS+=("-DLLVM_USE_SANITIZER=${USE_SANITIZER}")
 fi
