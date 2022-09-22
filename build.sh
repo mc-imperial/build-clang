@@ -107,6 +107,11 @@ pushd "${INSTALL_DIR}"
 zip -r "../${INSTALL_DIR}.zip" ./*
 popd
 
+# We do not use the GITHUB_TOKEN provided by GitHub Actions.
+# We cannot set enviroment variables or secrets that start with GITHUB_ in .yml files,
+# but the github-release-retry tool requires GITHUB_TOKEN, so we set it here.
+export GITHUB_TOKEN="${GH_TOKEN}"
+
 DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}.")"
 
 "${PYTHON}" -m github_release_retry.github_release_retry \
