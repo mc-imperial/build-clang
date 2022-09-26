@@ -95,16 +95,7 @@ BUILD_DIR="b_${CONFIG}"
 
 CMAKE_OPTIONS+=("-DLLVM_TARGETS_TO_BUILD=X86" "-DLLVM_ENABLE_ZSTD=OFF")
 
-CMAKE_OPTIONS+=("-DLLVM_BUILD_TOOLS=OFF")
-CMAKE_OPTIONS+=("-DLLVM_BUILD_UTILS=OFF")
-CMAKE_OPTIONS+=("-DLLVM_BUILD_RUNTIMES=OFF")
-
-if [ "${CONFIG}" == "Debug" ]
-then
-    CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'")
-else
-    CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'")
-fi
+CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'")
 
 mkdir -p "${BUILD_DIR}"
 pushd "${BUILD_DIR}"
@@ -115,10 +106,6 @@ popd
 
 # zip file.
 pushd "${INSTALL_DIR}"
-if [ "${CONFIG}" == "Debug" ]
-then
-    rm bin/*
-fi
 zip -r "../${INSTALL_DIR}.zip" ./*
 popd
 

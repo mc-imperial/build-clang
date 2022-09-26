@@ -26,17 +26,11 @@ jobs:
           - macOS-latest
         config:
           - Debug
-          - Release
         # Manually list various Linux configurations.
         include:
           # clang-12 release
           - os: ubuntu-latest
             config: Release
-            linux_cc: clang-12
-            linux_cxx: clang++-12
-          # clang-12 debug
-          - os: ubuntu-latest
-            config: Debug
             linux_cc: clang-12
             linux_cxx: clang++-12
     runs-on: ${{ matrix.os }}
