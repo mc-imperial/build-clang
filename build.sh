@@ -67,11 +67,6 @@ COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
 
 INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
 
-if [ -n "${USE_SANITIZER}" ]
-then
-    INSTALL_DIR="${INSTALL_DIR}-${USE_SANITIZER}-Sanitizer"
-fi
-
 export PATH="${HOME}/bin:$PATH"
 
 mkdir -p "${HOME}/bin"
@@ -100,13 +95,13 @@ BUILD_DIR="b_${CONFIG}"
 
 CMAKE_OPTIONS+=("-DLLVM_TARGETS_TO_BUILD=X86" "-DLLVM_ENABLE_ZSTD=OFF")
 
-if [ -n "${USE_SANITIZER}" ]
+CMAKE_OPTIONS+=("-DLLVM_BUILD_TOOLS=OFF")
+CMAKE_OPTIONS+=("-DLLVM_BUILD_UTILS=OFF")
+CMAKE_OPTIONS+=("-DLLVM_BUILD_RUNTIMES=OFF")
+
+if [ "${CONFIG}" == "Debug" ]
 then
     CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'")
-    CMAKE_OPTIONS+=("-DLLVM_USE_SANITIZER=${USE_SANITIZER}")
-    CMAKE_OPTIONS+=("-DLLVM_BUILD_TOOLS=OFF")
-    CMAKE_OPTIONS+=("-DLLVM_BUILD_UTILS=OFF")
-    CMAKE_OPTIONS+=("-DLLVM_BUILD_RUNTIMES=OFF")
 else
     CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'")
 fi
@@ -120,6 +115,10 @@ popd
 
 # zip file.
 pushd "${INSTALL_DIR}"
+if [ "${CONFIG}" == "Debug" ]
+then
+    rm bin/*
+fi
 zip -r "../${INSTALL_DIR}.zip" ./*
 popd
 

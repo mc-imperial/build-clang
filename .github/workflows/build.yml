@@ -39,18 +39,11 @@ jobs:
             config: Debug
             linux_cc: clang-12
             linux_cxx: clang++-12
-          # clang-12 asan
-          - os: ubuntu-latest
-            config: Release
-            linux_cc: clang-12
-            linux_cxx: clang++-12
-            use_sanitizer: Address
     runs-on: ${{ matrix.os }}
     env:
       CONFIG: ${{ matrix.config }}
       LINUX_CC: ${{ matrix.linux_cc }}
       LINUX_CXX: ${{ matrix.linux_cxx }}
-      USE_SANITIZER: ${{ matrix.use_sanitizer }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
 
