@@ -95,7 +95,17 @@ BUILD_DIR="b_${CONFIG}"
 
 CMAKE_OPTIONS+=("-DLLVM_TARGETS_TO_BUILD=X86" "-DLLVM_ENABLE_ZSTD=OFF")
 
-CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'")
+if [ "${CONFIG}" == "Debug" ]
+then
+    CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang'")
+    CMAKE_OPTIONS+=("-DLLVM_INCLUDE_TOOLS=OFF")
+    CMAKE_OPTIONS+=("-DLLVM_INCLUDE_UTILS=OFF")
+    CMAKE_OPTIONS+=("-DLLVM_INCLUDE_RUNTIMES=OFF")
+else
+    CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'")
+fi
+
+CMAKE_OPTIONS+=("-DLLVM_USE_LINKER=lld")
 
 mkdir -p "${BUILD_DIR}"
 pushd "${BUILD_DIR}"
@@ -106,6 +116,10 @@ popd
 
 # zip file.
 pushd "${INSTALL_DIR}"
+if [ "${CONFIG}" == "Debug" ]
+then
+    rm bin/*
+fi
 zip -r "../${INSTALL_DIR}.zip" ./*
 popd
 
@@ -119,7 +133,7 @@ DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}.")
 "${PYTHON}" -m github_release_retry.github_release_retry \
   --user "mc-imperial" \
   --repo "build-clang" \
-  --tag_name "${COMMIT_ID}" \
+  --tag_name "${COMMIT_ID}-temp" \
   --target_commitish "${GITHUB_SHA}" \
   --body_string "${DESCRIPTION}" \
   "${INSTALL_DIR}.zip"
