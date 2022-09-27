@@ -25,7 +25,7 @@ jobs:
           - windows-latest
           - macOS-latest
         config:
-          - Debug
+          - Release
         # Manually list various Linux configurations.
         include:
           # clang-12 release
