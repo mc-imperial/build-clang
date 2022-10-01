@@ -95,6 +95,7 @@ BUILD_DIR="b_${CONFIG}"
 
 mkdir -p "${BUILD_DIR}"
 cmake -G Ninja -S llvm -B ${BUILD_DIR} \
+      -DCMAKE_BUILD_TYPE=${CONFIG} \
       -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
       -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
       -DLLVM_ENABLE_RUNTIMES="compiler-rt;libc;libcxx;libcxxabi;libunwind" \
@@ -104,7 +105,7 @@ cmake -G Ninja -S llvm -B ${BUILD_DIR} \
       -DCLANG_DEFAULT_RTLIB=compiler-rt \
       -DCLANG_DEFAULT_UNWINDLIB=libunwind
 ninja -C "${BUILD_DIR}" runtimes
-ninja -C"${BUILD_DIR}"build check-runtimes
+ninja -C"${BUILD_DIR}" check-runtimes
 ninja -C "${BUILD_DIR}" install-runtimes
 
 # zip file.
