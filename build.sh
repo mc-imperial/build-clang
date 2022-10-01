@@ -93,16 +93,20 @@ git checkout "${COMMIT_ID}"
 
 BUILD_DIR="b_${CONFIG}"
 
-CMAKE_OPTIONS+=("-DLLVM_TARGETS_TO_BUILD=X86" "-DLLVM_ENABLE_ZSTD=OFF")
-
-CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'")
-
 mkdir -p "${BUILD_DIR}"
-pushd "${BUILD_DIR}"
-cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "${CMAKE_OPTIONS[@]}"
-cmake --build . --config "${CMAKE_BUILD_TYPE}"
-cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
-popd
+cmake -G Ninja -S llvm -B ${BUILD_DIR} \
+      -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+      -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
+      -DLLVM_ENABLE_RUNTIMES="compiler-rt;libc;libcxx;libcxxabi;libunwind" \
+      -DLLVM_ENABLE_ZSTD=OFF \
+      -DLLVM_TARGETS_TO_BUILD=X86 \
+      -DCLANG_DEFAULT_LINKER=lld \
+      -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+      -DCLANG_DEFAULT_RTLIB=compiler-rt \
+      -DCLANG_DEFAULT_UNWINDLIB=libunwind
+ninja -C build runtimes
+ninja -C build check-runtimes
+ninja -C build install-runtimes
 
 # zip file.
 pushd "${INSTALL_DIR}"
