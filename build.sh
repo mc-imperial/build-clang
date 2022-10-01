@@ -32,6 +32,7 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
+  RUNTIME_TRIPLE=x86_64-unknown-linux-gnu
   # Provided by build.yml.
   export CC="${LINUX_CC}"
   export CXX="${LINUX_CXX}"
@@ -47,6 +48,7 @@ case "$(uname)" in
   NINJA_OS="mac"
   BUILD_PLATFORM="Mac_x64"
   PYTHON="python3"
+  RUNTIME_TRIPLE=x86_64-apple-darwin
   ;;
 
 "MINGW"*|"MSYS_NT"*)
@@ -99,6 +101,7 @@ cmake -G Ninja -S llvm -B ${BUILD_DIR} \
       -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
       -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
       -DLLVM_ENABLE_RUNTIMES="compiler-rt;libc;libcxx;libcxxabi;libunwind" \
+      -DLLVM_RUNTIME_TARGETS="${RUNTIME_TRIPLE}" \
       -DLLVM_TARGETS_TO_BUILD=X86 \
       -DCLANG_DEFAULT_LINKER=lld \
       -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
