@@ -104,9 +104,9 @@ cmake -G Ninja -S llvm -B ${BUILD_DIR} \
       -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
       -DCLANG_DEFAULT_RTLIB=compiler-rt \
       -DCLANG_DEFAULT_UNWINDLIB=libunwind
-ninja -C build runtimes
-ninja -C build check-runtimes
-ninja -C build install-runtimes
+ninja -C "${BUILD_DIR}" runtimes
+ninja -C"${BUILD_DIR}"build check-runtimes
+ninja -C "${BUILD_DIR}" install-runtimes
 
 # zip file.
 pushd "${INSTALL_DIR}"
