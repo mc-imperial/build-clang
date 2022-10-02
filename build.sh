@@ -33,8 +33,8 @@ case "$(uname)" in
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
   # Provided by build.yml.
-  export CC=clang-12
-  export CXX=clang++-12
+  export CC=clang-11
+  export CXX=clang++-11
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
