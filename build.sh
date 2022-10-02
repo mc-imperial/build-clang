@@ -30,11 +30,11 @@ uname
 case "$(uname)" in
 "Linux")
   NINJA_OS="linux"
-  BUILD_PLATFORM="Linux_x64"
+  BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
   # Provided by build.yml.
-  export CC="${LINUX_CC}"
-  export CXX="${LINUX_CXX}"
+  export CC=clang-12
+  export CXX=clang++-12
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
