@@ -32,7 +32,6 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
-  RUNTIME_TRIPLE=x86_64-unknown-linux-gnu
   # Provided by build.yml.
   export CC="${LINUX_CC}"
   export CXX="${LINUX_CXX}"
@@ -48,7 +47,6 @@ case "$(uname)" in
   NINJA_OS="mac"
   BUILD_PLATFORM="Mac_x64"
   PYTHON="python3"
-  RUNTIME_TRIPLE=x86_64-apple-darwin
   ;;
 
 "MINGW"*|"MSYS_NT"*)
@@ -67,7 +65,7 @@ esac
 
 COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
 
-INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
+INSTALL_DIR="temp-build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
 
 export PATH="${HOME}/bin:$PATH"
 
@@ -100,12 +98,10 @@ cmake -G Ninja -S llvm -B ${BUILD_DIR} \
       -DCMAKE_BUILD_TYPE=${CONFIG} \
       -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
       -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
-      -DLLVM_ENABLE_RUNTIMES="compiler-rt;libc;libcxx;libcxxabi;libunwind" \
-      -DLLVM_RUNTIME_TARGETS="${RUNTIME_TRIPLE}" \
+      -DLLVM_ENABLE_RUNTIMES="libc;libcxx;libcxxabi;libunwind" \
       -DLLVM_TARGETS_TO_BUILD=X86 \
       -DCLANG_DEFAULT_LINKER=lld \
       -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-      -DCLANG_DEFAULT_RTLIB=compiler-rt \
       -DCLANG_DEFAULT_UNWINDLIB=libunwind
 ninja -C "${BUILD_DIR}" runtimes
 ninja -C"${BUILD_DIR}" check-runtimes
@@ -126,7 +122,7 @@ DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}.")
 "${PYTHON}" -m github_release_retry.github_release_retry \
   --user "mc-imperial" \
   --repo "build-clang" \
-  --tag_name "${COMMIT_ID}" \
+  --tag_name "temp-${COMMIT_ID}" \
   --target_commitish "${GITHUB_SHA}" \
   --body_string "${DESCRIPTION}" \
   "${INSTALL_DIR}.zip"
