@@ -98,7 +98,7 @@ cmake -G Ninja -S llvm -B ${BUILD_DIR} \
       -DCMAKE_BUILD_TYPE=${CONFIG} \
       -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
       -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
-      -DLLVM_ENABLE_RUNTIMES="libc;libcxx;libcxxabi;libunwind" \
+      -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
       -DLLVM_TARGETS_TO_BUILD=X86 \
       -DCLANG_DEFAULT_LINKER=lld \
       -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
