@@ -53,7 +53,7 @@ case "$(uname)" in
   NINJA_OS="win"
   BUILD_PLATFORM="Windows_x64"
   PYTHON="python"
-  CMAKE_OPTIONS+=("-DCMAKE_C_COMPILER=cl.exe" "-DCMAKE_CXX_COMPILER=cl.exe")
+  CMAKE_OPTIONS+=("-DCMAKE_C_COMPILER=clang-cl.exe" "-DCMAKE_CXX_COMPILER=clang-cl.exe")
   choco install zip
   ;;
 
@@ -98,14 +98,22 @@ cmake -G Ninja -S llvm -B ${BUILD_DIR} \
       -DCMAKE_BUILD_TYPE=${CONFIG} \
       -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
       -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
-      -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
       -DLLVM_TARGETS_TO_BUILD=X86 \
       -DCLANG_DEFAULT_LINKER=lld \
       -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-      -DCLANG_DEFAULT_UNWINDLIB=libunwind
-ninja -C "${BUILD_DIR}" runtimes
-ninja -C"${BUILD_DIR}" check-runtimes
-ninja -C "${BUILD_DIR}" install-runtimes
+      -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+      "${CMAKE_OPTIONS[@]}"
+ninja -C "${BUILD_DIR}"
+ninja -C "${BUILD_DIR}" install
+
+BUILD_RUNTIMES_DIR="b_runtimes_${CONFIG}"
+cmake -G Ninja -S runtimes -B ${BUILD_RUNTIMES_DIR} \
+      -DCMAKE_BUILD_TYPE=${CONFIG} \
+      -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
+      -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+      "${CMAKE_OPTIONS[@]}"
+ninja -C ${BUILD_RUNTIMES_DIR} cxx cxxabi unwind
+ninja -C ${BUILD_RUNTIMES_DIR} install-cxx install-cxxabi install-unwind
 
 # zip file.
 pushd "${INSTALL_DIR}"
