@@ -32,6 +32,7 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
+  sudo apt install -y gcc-multilib
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
@@ -93,6 +94,9 @@ mkdir ${BUILD_DIR}
 cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -S llvm -B ${BUILD_DIR}
 ninja -C ${BUILD_DIR}
 ninja -C ${BUILD_DIR} install
+
+# Remove the build directory to save space.
+rm -rf ${BUILD_DIR}
 
 # zip file.
 pushd "${INSTALL_DIR}"
