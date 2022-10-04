@@ -82,7 +82,6 @@ ls
 
 popd
 
-CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
 
 git clone https://github.com/llvm/llvm-project.git
@@ -90,13 +89,23 @@ cd llvm-project
 git checkout "${COMMIT_ID}"
 
 BUILD_DIR="b_${CONFIG}"
-mkdir ${BUILD_DIR}
-cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -S llvm -B ${BUILD_DIR}
-ninja -C ${BUILD_DIR}
-ninja -C ${BUILD_DIR} install
+mkdir "${BUILD_DIR}"
+cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
+cat "${BUILD_DIR}"/CMakeCache.txt
+NINJA_RESULT=$(ninja -C "${BUILD_DIR}")
+for f in $(find "${BUILD_DIR}" -name "CMakeCache.txt")
+do
+    echo "$f"
+    cat "$f"
+done
+if [ "$NINJA_RESULT" -ne 0 ]
+then
+    exit "$NINJA_RESULT"
+fi
+ninja -C "${BUILD_DIR}" install
 
 # Remove the build directory to save space.
-rm -rf ${BUILD_DIR}
+rm -rf "${BUILD_DIR}"
 
 # zip file.
 pushd "${INSTALL_DIR}"
