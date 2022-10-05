@@ -32,7 +32,9 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
-  sudo apt install -y gcc-multilib
+  sudo apt install -y gcc-multilib libc++-12-dev clang-12
+  export CC=clang-12
+  export CXX=clang++-12
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
@@ -87,9 +89,6 @@ CMAKE_BUILD_TYPE="${CONFIG}"
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
-
-# Temporary
-git apply ../patch.txt
 
 BUILD_DIR="b_${CONFIG}"
 mkdir "${BUILD_DIR}"
