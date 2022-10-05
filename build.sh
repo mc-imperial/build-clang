@@ -32,9 +32,16 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
-  sudo apt install -y gcc-multilib libc++-11-dev clang-11
-  export CC=clang-11
-  export CXX=clang++-11
+  if [ "${OS}" == "ubuntu-22.04" ]
+  then
+    sudo apt install -y gcc-multilib libc++-12-dev clang-12
+    export CC=clang-12
+    export CXX=clang++-12
+  else
+    sudo apt install -y gcc-multilib libc++-10-dev clang-10
+    export CC=clang-10
+    export CXX=clang++-10
+  fi
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
