@@ -88,6 +88,9 @@ git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
 
+# Temporary
+git apply ../patch.txt
+
 BUILD_DIR="b_${CONFIG}"
 mkdir "${BUILD_DIR}"
 cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
