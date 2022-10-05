@@ -84,8 +84,6 @@ ls
 
 popd
 
-CMAKE_BUILD_TYPE="${CONFIG}"
-
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
@@ -93,28 +91,14 @@ git checkout "${COMMIT_ID}"
 BUILD_DIR="b_${CONFIG}"
 mkdir "${BUILD_DIR}"
 cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
-cat "${BUILD_DIR}"/CMakeCache.txt
-set +e
 ninja -C "${BUILD_DIR}"
-for f in $(find "${BUILD_DIR}" -name "CMakeCache.txt")
-do
-    echo "$f"
-    cat "$f"
-done
-#echo "Stopping."
-#exit 1
-#ninja -C "${BUILD_DIR}" install
-#
-## Remove the build directory to save space.
-#rm -rf "${BUILD_DIR}"
-#
-## zip file.
-#pushd "${INSTALL_DIR}"
-#zip -r "../${INSTALL_DIR}.zip" ./*
-#popd
+ninja -C "${BUILD_DIR}" install
 
-# TEMPORARY: zip up the build dir instead of the install dir.
-pushd "${BUILD_DIR}"
+# Remove the build directory to save space.
+rm -rf "${BUILD_DIR}"
+
+# zip file.
+pushd "${INSTALL_DIR}"
 zip -r "../${INSTALL_DIR}.zip" ./*
 popd
 
