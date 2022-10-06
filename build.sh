@@ -32,16 +32,16 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
-  if [ "${OS}" == "ubuntu-22.04" ]
-  then
-    sudo apt install -y gcc-multilib libc++-12-dev clang-12
-    export CC=clang-12
-    export CXX=clang++-12
-  else
-    sudo apt install -y gcc-multilib libc++-10-dev clang-10
-    export CC=clang-10
-    export CXX=clang++-10
-  fi
+
+  # Use a pre-built clang
+  curl -Lo clang+llvm.tar.xz https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/clang+llvm-13.0.1-x86_64-linux-gnu-ubuntu-18.04.tar.xz
+  tar xf clang+llvm.tar.xz
+  mv clang+llvm-13.0.1-x86_64-linux-gnu-ubuntu-18.04 clang+llvm
+  rm clang+llvm.tar.xz
+  export PATH=${WORK}/clang+llvm/bin:$PATH
+  export CC=clang-13
+  export CXX=clang++-13
+
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
