@@ -43,6 +43,8 @@ case "$(uname)" in
   ls ${WORK}/clang+llvm
   ls ${WORK}/clang+llvm/bin
   export PATH="${WORK}/clang+llvm/bin":$PATH
+  which clang-13
+  which clang++-13
   export CC=clang-13
   export CXX=clang++-13
 
