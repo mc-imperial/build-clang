@@ -38,15 +38,9 @@ case "$(uname)" in
   tar xf clang+llvm.tar.xz
   mv clang+llvm-13.0.1-x86_64-linux-gnu-ubuntu-18.04 clang+llvm
   rm clang+llvm.tar.xz
-  echo "${WORK}"
-  ls ${WORK}
-  ls ${WORK}/clang+llvm
-  ls ${WORK}/clang+llvm/bin
   export PATH="${WORK}/clang+llvm/bin":$PATH
-  which clang-13
-  which clang++-13
-  export CC=clang-13
-  export CXX=clang++-13
+  export CC=clang
+  export CXX=clang++
 
   df -h
   sudo apt clean
