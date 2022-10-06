@@ -32,6 +32,16 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
+  if [ "${OS}" == "ubuntu-22.04" ]
+  then
+    sudo apt install -y gcc-multilib libc++-12-dev clang-12
+    export CC=clang-12
+    export CXX=clang++-12
+  else
+    sudo apt install -y gcc-multilib libc++-10-dev clang-10
+    export CC=clang-10
+    export CXX=clang++-10
+  fi
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
@@ -81,25 +91,18 @@ ls
 
 popd
 
-CMAKE_GENERATOR="Ninja"
-CMAKE_BUILD_TYPE="${CONFIG}"
-
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
 
 BUILD_DIR="b_${CONFIG}"
+mkdir "${BUILD_DIR}"
+cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
+ninja -C "${BUILD_DIR}"
+ninja -C "${BUILD_DIR}" install
 
-CMAKE_OPTIONS+=("-DLLVM_TARGETS_TO_BUILD=X86" "-DLLVM_ENABLE_ZSTD=OFF")
-
-CMAKE_OPTIONS+=("-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'")
-
-mkdir -p "${BUILD_DIR}"
-pushd "${BUILD_DIR}"
-cmake ../llvm -G "${CMAKE_GENERATOR}" "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "${CMAKE_OPTIONS[@]}"
-cmake --build . --config "${CMAKE_BUILD_TYPE}"
-cmake "-DCMAKE_INSTALL_PREFIX=../${INSTALL_DIR}" "-DBUILD_TYPE=${CMAKE_BUILD_TYPE}" -P cmake_install.cmake
-popd
+# Remove the build directory to save space.
+rm -rf "${BUILD_DIR}"
 
 # zip file.
 pushd "${INSTALL_DIR}"
