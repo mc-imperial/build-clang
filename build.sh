@@ -42,6 +42,7 @@ case "$(uname)" in
   export CC=clang
   export CXX=clang++
 
+  sudo apt install -y gcc-multilib
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
