@@ -119,7 +119,7 @@ DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}.")
 "${PYTHON}" -m github_release_retry.github_release_retry \
   --user "mc-imperial" \
   --repo "build-clang" \
-  --tag_name "${COMMIT_ID}" \
+  --tag_name "bootstrap-${COMMIT_ID}" \
   --target_commitish "${GITHUB_SHA}" \
   --body_string "${DESCRIPTION}" \
   "${INSTALL_DIR}.zip"
