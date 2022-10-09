@@ -20,9 +20,6 @@ set -u
 
 WORK="$(pwd)"
 
-# Old bash versions can't expand empty arrays, so we always include at least this option.
-CMAKE_OPTIONS=("-DCMAKE_OSX_ARCHITECTURES=x86_64")
-
 help | head
 
 uname
@@ -32,16 +29,13 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
-  if [ "${OS}" == "ubuntu-22.04" ]
+  if [ "${OS}" == "ubuntu-20.04" ]
   then
-    sudo apt install -y gcc-multilib libc++-12-dev clang-12
-    export CC=clang-12
-    export CXX=clang++-12
+    BUILD_CLANG_OS="ubuntu-22.04"
   else
-    sudo apt install -y gcc-multilib libc++-10-dev clang-10
-    export CC=clang-10
-    export CXX=clang++-10
+    BUILD_CLANG_OS="${BUILD_PLATFORM}"
   fi
+  sudo apt install -y gcc-multilib
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
@@ -54,13 +48,14 @@ case "$(uname)" in
   NINJA_OS="mac"
   BUILD_PLATFORM="Mac_x64"
   PYTHON="python3"
+  BUILD_CLANG_OS="${BUILD_PLATFORM}"
   ;;
 
 "MINGW"*|"MSYS_NT"*)
   NINJA_OS="win"
   BUILD_PLATFORM="Windows_x64"
+  BUILD_CLANG_OS="${BUILD_PLATFORM}"
   PYTHON="python"
-  CMAKE_OPTIONS+=("-DCMAKE_C_COMPILER=cl.exe" "-DCMAKE_CXX_COMPILER=cl.exe")
   choco install zip
   ;;
 
@@ -91,13 +86,30 @@ ls
 
 popd
 
+export PATH="${HOME}/clang+llvm/bin:$PATH"
+
+mkdir -p "${HOME}/clang+llvm"
+pushd "${HOME}/clang+llvm"
+
+# Install pre-built clang.
+curl -fsSL -o clang+llvm.zip "https://github.com/mc-imperial/build-clang/releases/download/bootstrap-llvmorg-14.0.6/build-clang-llvmorg-14.0.6-${BUILD_CLANG_OS}_Release.zip"
+unzip clang+llvm.zip
+
+popd
+
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
 
+export CC=clang
+export CXX=clang++
+
+which "${CC}"
+which "${CXX}"
+
 BUILD_DIR="b_${CONFIG}"
 mkdir "${BUILD_DIR}"
-cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
+cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
 ninja -C "${BUILD_DIR}"
 ninja -C "${BUILD_DIR}" install
 
@@ -119,7 +131,7 @@ DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}.")
 "${PYTHON}" -m github_release_retry.github_release_retry \
   --user "mc-imperial" \
   --repo "build-clang" \
-  --tag_name "bootstrap-${COMMIT_ID}" \
+  --tag_name "${COMMIT_ID}" \
   --target_commitish "${GITHUB_SHA}" \
   --body_string "${DESCRIPTION}" \
   "${INSTALL_DIR}.zip"
