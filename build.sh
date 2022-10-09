@@ -31,7 +31,7 @@ case "$(uname)" in
   PYTHON="python3"
   if [ "${OS}" == "ubuntu-20.04" ]
   then
-    BUILD_CLANG_OS="ubuntu-22.04"
+    BUILD_CLANG_OS="ubuntu-18.04_x64"
   else
     BUILD_CLANG_OS="${BUILD_PLATFORM}"
   fi
