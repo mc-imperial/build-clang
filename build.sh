@@ -20,46 +20,45 @@ set -u
 
 WORK="$(pwd)"
 
-CMAKE_OPTIONS=("-DCMAKE_OSX_ARCHITECTURES=x86_64")
-
 help | head
 
 uname
 
 case "$(uname)" in
 "Linux")
-  sudo apt install -y gcc-multilib
+  sudo apt install -y gcc-multilib libc++-12-dev clang-12
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
-  if [ "${OS}" == "ubuntu-22.04" ]
-  then
-    sudo apt install -y libc++-12-dev clang-12
-    BUILD_CLANG_OS="ubuntu-22.04_x64"
-  else
-    sudo apt install -y libc++-10-dev clang-10
-    BUILD_CLANG_OS="ubuntu-18.04_x64"
-  fi
-  find /usr/lib -name "libc++.a"
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
   docker rmi -f $(docker image ls -aq)
   sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
   df -h
+
+  mkdir -p "${HOME}/clang+llvm"
+  pushd "${HOME}/clang+llvm"
+    # Install pre-built clang.
+    curl -fsSL -o clang+llvm.zip "https://github.com/mc-imperial/build-clang/releases/download/bootstrap-llvmorg-14.0.6/build-clang-llvmorg-14.0.6-${BUILD_PLATFORM}_Release.zip"
+    unzip clang+llvm.zip
+  popd
+  export PATH="${HOME}/clang+llvm/bin:$PATH"
+  export CC=clang
+  export CXX=clang++
+  which "${CC}"
+  which "${CXX}"
   ;;
 
 "Darwin")
   NINJA_OS="mac"
   BUILD_PLATFORM="Mac_x64"
   PYTHON="python3"
-  BUILD_CLANG_OS="${BUILD_PLATFORM}"
   ;;
 
 "MINGW"*|"MSYS_NT"*)
   NINJA_OS="win"
   BUILD_PLATFORM="Windows_x64"
-  BUILD_CLANG_OS="${BUILD_PLATFORM}"
   PYTHON="python"
   choco install zip
   ;;
@@ -70,48 +69,39 @@ case "$(uname)" in
   ;;
 esac
 
-COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
-
-INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
-
 export PATH="${HOME}/bin:$PATH"
-
 mkdir -p "${HOME}/bin"
 
 pushd "${HOME}/bin"
 
-# Install github-release-retry.
-"${PYTHON}" -m pip install --user 'github-release-retry==1.*'
+  # Install github-release-retry.
+  "${PYTHON}" -m pip install --user 'github-release-retry==1.*'
 
-# Install ninja.
-curl -fsSL -o ninja-build.zip "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-${NINJA_OS}.zip"
-unzip ninja-build.zip
+  # Install ninja.
+  curl -fsSL -o ninja-build.zip "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-${NINJA_OS}.zip"
+  unzip ninja-build.zip
 
-ls
-
-popd
-
-export PATH="${HOME}/clang+llvm/bin:$PATH"
-
-mkdir -p "${HOME}/clang+llvm"
-pushd "${HOME}/clang+llvm"
-
-# Install pre-built clang.
-curl -fsSL -o clang+llvm.zip "https://github.com/mc-imperial/build-clang/releases/download/bootstrap-llvmorg-14.0.6/build-clang-llvmorg-14.0.6-${BUILD_CLANG_OS}_Release.zip"
-unzip clang+llvm.zip
+  ls
 
 popd
+
+git clone https://github.com/llvm/llvm-project.git
+cd llvm-project
+COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
+git checkout "${COMMIT_ID}"
+
+INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
+
+BUILD_DIR="b_${CONFIG}"
+mkdir "${BUILD_DIR}"
 
 case "$(uname)" in
-"Linux")
-  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=-L${HOME}/clang+llvm/lib/x86_64-unknown-linux-gnu")
-  ;;
-
-"Darwin")
-  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=-L${HOME}/clang+llvm/lib")
+"Linux"|"Darwin")
+  cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
   ;;
 
 "MINGW"*|"MSYS_NT"*)
+  cmake -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" -DLLVM_ENABLE_PROJECTS="clang"
   ;;
 
 *)
@@ -120,19 +110,6 @@ case "$(uname)" in
   ;;
 esac
 
-git clone https://github.com/llvm/llvm-project.git
-cd llvm-project
-git checkout "${COMMIT_ID}"
-
-export CC=clang
-export CXX=clang++
-
-which "${CC}"
-which "${CXX}"
-
-BUILD_DIR="b_${CONFIG}"
-mkdir "${BUILD_DIR}"
-cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" "${CMAKE_OPTIONS[@]}"
 ninja -C "${BUILD_DIR}"
 ninja -C "${BUILD_DIR}" install
 
