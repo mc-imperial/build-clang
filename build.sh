@@ -26,16 +26,16 @@ uname
 
 case "$(uname)" in
 "Linux")
-  sudo apt install -y gcc-multilib
+  sudo apt install -y gcc-multilib libc++-1
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
   if [ "${OS}" == "ubuntu-22.04" ]
   then
-    sudo apt install -y libc++-12-dev libc++-1-12 clang-12
+    sudo apt install -y libc++-12-dev clang-12
     BUILD_CLANG_OS="ubuntu-22.04_x64"
   else
-    sudo apt install -y libc++-10-dev libc++-1-10 clang-10
+    sudo apt install -y libc++-10-dev clang-10
     BUILD_CLANG_OS="ubuntu-18.04_x64"
   fi
   df -h
