@@ -101,7 +101,7 @@ case "$(uname)" in
   ;;
 
 "MINGW"*|"MSYS_NT"*)
-  cmake -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" -DLLVM_ENABLE_PROJECTS="clang"
+  cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" -DLLVM_ENABLE_PROJECTS="clang"
   ;;
 
 *)
