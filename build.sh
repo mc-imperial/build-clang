@@ -26,7 +26,7 @@ uname
 
 case "$(uname)" in
 "Linux")
-  sudo apt install -y gcc-multilib libc++-1
+  sudo apt install -y gcc-multilib
   NINJA_OS="linux"
   BUILD_PLATFORM="${OS}_x64"
   PYTHON="python3"
