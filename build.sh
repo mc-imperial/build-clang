@@ -20,6 +20,8 @@ set -u
 
 WORK="$(pwd)"
 
+CMAKE_OPTIONS=("-DCMAKE_OSX_ARCHITECTURES=x86_64")
+
 help | head
 
 uname
@@ -38,6 +40,7 @@ case "$(uname)" in
     sudo apt install -y libc++-10-dev clang-10
     BUILD_CLANG_OS="ubuntu-18.04_x64"
   fi
+  find /usr/lib -name "libc++.a"
   df -h
   sudo apt clean
   # shellcheck disable=SC2046
@@ -99,6 +102,24 @@ unzip clang+llvm.zip
 
 popd
 
+case "$(uname)" in
+"Linux")
+  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=\"-L ${HOME}/clang+llvm/lib/x86_64-unknown-linux-gnu\"")
+  ;;
+
+"Darwin")
+  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=\"-L ${HOME}/clang+llvm/lib\"")
+  ;;
+
+"MINGW"*|"MSYS_NT"*)
+  ;;
+
+*)
+  echo "Unknown OS"
+  exit 1
+  ;;
+esac
+
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
 git checkout "${COMMIT_ID}"
@@ -111,7 +132,7 @@ which "${CXX}"
 
 BUILD_DIR="b_${CONFIG}"
 mkdir "${BUILD_DIR}"
-cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
+cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" "${CMAKE_OPTIONS[@]}"
 ninja -C "${BUILD_DIR}"
 ninja -C "${BUILD_DIR}" install
 
