@@ -104,11 +104,11 @@ popd
 
 case "$(uname)" in
 "Linux")
-  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=\"-L ${HOME}/clang+llvm/lib/x86_64-unknown-linux-gnu\"")
+  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=-L${HOME}/clang+llvm/lib/x86_64-unknown-linux-gnu")
   ;;
 
 "Darwin")
-  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=\"-L ${HOME}/clang+llvm/lib\"")
+  CMAKE_OPTIONS+=("-DCMAKE_EXE_LINKER_FLAGS=-L${HOME}/clang+llvm/lib")
   ;;
 
 "MINGW"*|"MSYS_NT"*)
