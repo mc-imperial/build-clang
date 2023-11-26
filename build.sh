@@ -93,7 +93,7 @@ cd llvm-project
 COMMIT_ID="$(cat "${WORK}/COMMIT_ID")"
 git checkout "${COMMIT_ID}"
 
-INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}"
+INSTALL_DIR="build-clang-${COMMIT_ID}-${BUILD_PLATFORM}_${CONFIG}-experiment"
 
 BUILD_DIR="b_${CONFIG}"
 mkdir "${BUILD_DIR}"
@@ -124,7 +124,7 @@ case "$(uname)" in
   ;;
 esac
 
-ninja -C "${BUILD_DIR}"
+ninja -C "${BUILD_DIR}" stage2
 ninja -C "${BUILD_DIR}" install
 
 # Remove the build directory to save space.
@@ -145,7 +145,7 @@ DESCRIPTION="$(echo -e "Automated build for llvm-project version ${COMMIT_ID}.")
 "${PYTHON}" -m github_release_retry.github_release_retry \
   --user "mc-imperial" \
   --repo "build-clang" \
-  --tag_name "${COMMIT_ID}" \
+  --tag_name "${COMMIT_ID}-experiment" \
   --target_commitish "${GITHUB_SHA}" \
   --body_string "${DESCRIPTION}" \
   "${INSTALL_DIR}.zip"

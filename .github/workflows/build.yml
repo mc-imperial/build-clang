@@ -21,15 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - windows-latest
-          - macOS-latest
         config:
           - Release
         include:
-          - os: ubuntu-22.04
-            config: Release
-            build_with_prebuilt_clang: 0
           - os: ubuntu-22.04
             config: Release
             build_with_prebuilt_clang: 1
