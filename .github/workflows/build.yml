@@ -21,17 +21,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - windows-latest
+          - macOS-latest
         config:
           - Release
         include:
           - os: ubuntu-22.04
             config: Release
-            build_with_prebuilt_clang: 1
     runs-on: ${{ matrix.os }}
     env:
       OS: ${{ matrix.os }}
       CONFIG: ${{ matrix.config }}
-      BUILD_WITH_PREBUILT_CLANG: ${{ matrix.build_with_prebuilt_clang }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
 

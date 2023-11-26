@@ -36,17 +36,6 @@ case "$(uname)" in
   docker rmi -f $(docker image ls -aq)
   sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
   df -h
-
-  if [ "${BUILD_WITH_PREBUILT_CLANG}" == 1 ]
-  then
-    mkdir -p "${HOME}/clang+llvm"
-    pushd "${HOME}/clang+llvm"
-      # Install pre-built clang.
-      curl -fsSL -o clang+llvm.zip "https://github.com/mc-imperial/build-clang/releases/download/bootstrap-llvmorg-14.0.6/build-clang-llvmorg-14.0.6-${BUILD_PLATFORM}_Release.zip"
-      unzip clang+llvm.zip
-    popd
-    export PATH="${HOME}/clang+llvm/bin:$PATH"
-  fi
   export CC=clang
   export CXX=clang++
   which "${CC}"
@@ -100,13 +89,7 @@ mkdir "${BUILD_DIR}"
 
 case "$(uname)" in
 "Linux")
-  if [ "${BUILD_WITH_PREBUILT_CLANG}" == 0 ]
-  then
-    INSTALL_DIR="${INSTALL_DIR}-stock-clang"
-    cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"
-  else
-    INSTALL_DIR="${INSTALL_DIR}-prebuilt-clang"
-    cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
+  cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
   fi
   ;;
 
