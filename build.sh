@@ -103,10 +103,10 @@ case "$(uname)" in
   if [ "${BUILD_WITH_PREBUILT_CLANG}" == 0 ]
   then
     INSTALL_DIR="${INSTALL_DIR}-stock-clang"
-    cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"
+    cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -DLLVM_ENABLE_RUNTIMES=compiler-rt
   else
     INSTALL_DIR="${INSTALL_DIR}-prebuilt-clang"
-    cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
+    cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}" -DLLVM_ENABLE_RUNTIMES=compiler-rt
   fi
   ;;
 
