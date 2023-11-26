@@ -90,7 +90,6 @@ mkdir "${BUILD_DIR}"
 case "$(uname)" in
 "Linux")
   cmake -G Ninja -C clang/cmake/caches/Fuchsia.cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -S llvm -B "${BUILD_DIR}"
-  fi
   ;;
 
 "Darwin")
