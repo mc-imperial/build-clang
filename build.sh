@@ -124,8 +124,8 @@ case "$(uname)" in
   ;;
 esac
 
-ninja -C "${BUILD_DIR}"
-ninja -C "${BUILD_DIR}" install
+cmake --build "${BUILD_DIR}"
+cmake --install "${BUILD_DIR}"
 
 # Remove the build directory to save space.
 rm -rf "${BUILD_DIR}"
