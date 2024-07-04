@@ -81,7 +81,7 @@ pushd "${HOME}/bin"
   "${PYTHON}" -m pip install --user 'github-release-retry==1.*'
 
   # Install ninja.
-  curl -fsSL -o ninja-build.zip "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-${NINJA_OS}.zip"
+  curl -fsSL -o ninja-build.zip "https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-${NINJA_OS}.zip"
   unzip ninja-build.zip
 
   ls
